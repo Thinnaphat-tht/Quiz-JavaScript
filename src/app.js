@@ -228,8 +228,6 @@ PAGES.dashboard = (root) => {
   const p = practiceDone();
   const mockBest = bestMock();
   const weak = weakTopics(state.attempts).slice(0, 4);
-  const streak = streakDays(state.days, new Date());
-  const acc = accuracy();
 
   const steps = [
     ['01', 'อ่านสรุปให้ครบ', `${r} จาก ${SECTIONS.length} หัวข้อ`, pct(r, SECTIONS.length), '#/notes/l6', r === SECTIONS.length],
@@ -237,69 +235,52 @@ PAGES.dashboard = (root) => {
     ['03', 'จำลองสอบ 20 ข้อ', state.mocks.length ? `ทำแล้ว ${state.mocks.length} รอบ ดีที่สุด ${mockBest}%` : 'ยังไม่เคยทำ', state.mocks.length ? 100 : 0, '#/mock', state.mocks.length > 0],
   ];
 
-  const lecRows = LEC_KEYS.map((k) => {
-    const secs = SECTIONS.filter((s) => s.lec === LEC_TO_NOTE[k]);
-    const rd = secs.filter((s) => state.read[s.id]).length;
-    return `<div class="lec-row"><span class="tag">${LEC_LABEL[k]}</span><div class="bar" role="img" aria-label="${LEC_LABEL[k]} อ่านแล้ว ${rd} จาก ${secs.length} หัวข้อ"><i data-w="${pct(rd, secs.length)}"></i></div><span class="pct">${rd}/${secs.length}</span></div>`;
+  const readOf = (noteId) => { const secs = SECTIONS.filter((s) => s.lec === noteId); return [secs.filter((s) => state.read[s.id]).length, secs.length]; };
+
+  const chapters = ['6', '7', '8'].map((k) => {
+    const note = NOTE_BY_ID[LEC_TO_NOTE[k]];
+    const [rd, total] = readOf(note.id);
+    const qs = PRACTICE.filter((q) => String(q.lec) === k);
+    const qd = qs.filter((q) => state.practice[q.id] !== undefined).length;
+    return `<article class="chapter">
+      <p class="ch-num mono"><small>LECTURE</small>${note.num}</p>
+      <h3>${esc(note.title)}</h3>
+      <p class="ch-sub">${esc(note.sub)}</p>
+      <div class="ch-prog"><span>อ่านแล้ว</span><b class="mono">${rd}/${total}</b></div>
+      <div class="bar" role="img" aria-label="${note.short} อ่านแล้ว ${rd} จาก ${total} หัวข้อ"><i data-w="${pct(rd, total)}"></i></div>
+      <div class="ch-links"><a class="btn btn-sm" href="#/notes/${note.id}">อ่านสรุป</a><a class="btn btn-sm" href="#/practice" data-flec="${k}">ฝึก ${qd}/${qs.length}</a></div>
+    </article>`;
   }).join('');
 
-  const recent = state.mocks.slice(-8);
-  let spark;
-  if (recent.length) {
-    const w = 320, h = 120, padL = 30, padR = 16, padT = 24, padB = 16;
-    const pts = recent.map((m, i) => [recent.length === 1 ? (w + padL - padR) / 2 : padL + 14 + (i * (w - padL - padR - 28)) / (recent.length - 1), padT + ((h - padT - padB) * (100 - m.pct)) / 100, m.pct]);
-    const line = pts.map((q) => q.slice(0, 2).join(',')).join(' ');
-    spark = `<svg class="spark" viewBox="0 0 ${w} ${h}" role="img" aria-label="คะแนน Mock ล่าสุด ${recent.map((m) => m.pct + '%').join(', ')}"><line x1="${padL}" x2="${w - padR}" y1="${h - padB}" y2="${h - padB}" stroke="var(--line-strong)"/><line x1="${padL}" x2="${w - padR}" y1="${padT}" y2="${padT}" stroke="var(--line)" stroke-dasharray="3 4"/><text x="${padL - 6}" y="${padT + 4}" text-anchor="end">100</text><text x="${padL - 6}" y="${h - padB + 4}" text-anchor="end">0</text><polyline points="${line}" fill="none" stroke="var(--accent)" stroke-width="2.5" stroke-linejoin="round"/>${pts.map((q) => `<circle cx="${q[0]}" cy="${q[1]}" r="4" fill="var(--surface)" stroke="var(--accent)" stroke-width="2.5"/><text x="${q[0]}" y="${q[1] + (q[1] < padT + 10 ? 18 : -9)}" text-anchor="middle">${q[2]}</text>`).join('')}</svg>`;
-  } else {
-    spark = '<div class="empty"><b>ยังไม่มีคะแนน</b> ทำ Mock Exam หนึ่งรอบ กราฟคะแนนจะขึ้นตรงนี้</div>';
-  }
-
-  const days = [];
-  for (let i = 13; i >= 0; i--) { const d = new Date(); d.setDate(d.getDate() - i); days.push(dayKey(d)); }
+  const cs = NOTE_BY_ID.cs;
+  const [csRead, csTotal] = readOf(cs.id);
 
   root.innerHTML = `
-  <section class="hero">
-    <div>
-      <p class="muted mono" style="margin:0 0 .75rem">${greet} · ITDS241 JavaScript</p>
-      <h1>ติวคืนก่อนสอบ ให้ <em>ครบทั้ง 3 บท</em> ในที่เดียว</h1>
-      <p class="lead">สรุปจากสไลด์ Lec 6, 7, 8 พร้อม Cheat Sheet ของอาจารย์ มีข้อสอบฝึกและข้อสอบจำลอง และระบบบอกว่าหัวข้อไหนควรกลับไปอ่าน</p>
-      <div class="actions">
-        <a class="btn btn-primary" href="${act.href}">${esc(act.text)} ${icon('arrow', 18)}</a>
-        <a class="btn" href="#/last">ทบทวนก่อนสอบ</a>
-      </div>
-      <p class="muted" style="margin:.9rem 0 0;font-size:.88rem">${esc(act.sub)}</p>
+  <header class="home-head">
+    <p class="kicker">${greet} · ITDS241 JavaScript</p>
+    <h1>ติวคืนก่อนสอบ ให้<em>ครบทั้ง 3 บท</em></h1>
+    <p class="lead">สรุปจากสไลด์ Lec 6, 7, 8 พร้อม Cheat Sheet ของอาจารย์ มีข้อสอบฝึกและข้อสอบจำลอง และระบบบอกว่าหัวข้อไหนควรกลับไปอ่าน</p>
+    <div class="actions">
+      <a class="btn btn-primary btn-lg" href="${act.href}">${esc(act.text)} ${icon('arrow', 18)}</a>
+      <a class="btn btn-lg" href="#/last">ทบทวนก่อนสอบ</a>
     </div>
-    <ol class="plan" aria-label="แผนก่อนสอบ">
-      ${steps.map((s) => `<li class="${s[5] ? 'done' : ''}"><span class="n">${s[0]}</span><a href="${s[4]}"><span><b><span>${s[1]}</span><span class="mono">${s[3]}%</span></b><small>${esc(s[2])}</small><div class="bar"><i data-w="${s[3]}"></i></div></span></a></li>`).join('')}
-    </ol>
+    <p class="next-sub">${esc(act.sub)}</p>
+  </header>
+  <ol class="steps" aria-label="แผนก่อนสอบ">
+    ${steps.map((s) => `<li class="${s[5] ? 'done' : ''}"><a href="${s[4]}"><span class="n">${s[0]}</span><b><span>${s[1]}</span><span class="mono">${s[3]}%</span></b><small>${esc(s[2])}</small><div class="bar"><i data-w="${s[3]}"></i></div></a></li>`).join('')}
+  </ol>
+  <section class="home-sec" aria-labelledby="toc-h">
+    <h2 id="toc-h">สารบัญ</h2>
+    <p class="sub">เลือกบทที่จะอ่านหรือฝึก ตัวเลขฝึกคือจำนวนข้อที่ตอบแล้วในบทนั้น</p>
+    <div class="chapters">${chapters}</div>
+    <a class="cs-line" href="#/notes/cs"><span><b>${esc(cs.short)}</b> ของอาจารย์ · ตารางอ้างอิง String / Array / Math / Date</span><span class="mono">${csRead}/${csTotal} ${icon('arrow', 16)}</span></a>
   </section>
-  <div class="dash-grid">
-    <div class="stack">
-      <section class="card" aria-labelledby="weak-h">
-        <h2 id="weak-h">หัวข้อที่ควรกลับไปทบทวน</h2>
-        <p class="sub">คิดจากการตอบ ${WEAK_WINDOW} ครั้งล่าสุดของแต่ละหัวข้อ แม่นต่ำกว่า 70% และตอบแล้วอย่างน้อย 2 ครั้ง</p>
-        ${weak.length ? `<ul class="weak-list">${weak.map((w) => { const s = SECTION_BY_ID[w.topic]; return `<li><a class="weak-item" href="#/notes/${s.lec}/${s.id}"><b>${esc(s.title)}</b><span class="pct">${Math.round(w.acc * 100)}%</span><small>${s.lecShort} · ตอบ ${w.n} ครั้งล่าสุด กดเพื่ออ่านหัวข้อนี้</small></a></li>`; }).join('')}</ul>` : `<div class="empty">${state.attempts.length < 2 ? '<b>ยังไม่มีข้อมูลพอ</b> ทำ Practice Quiz สักสองสามข้อ ระบบจะเริ่มชี้หัวข้อที่ควรอ่านซ้ำ' : '<b>ยังไม่พบหัวข้อที่อ่อน</b> ทำต่อเพื่อให้ผลแม่นขึ้น'}</div>`}
-      </section>
-      <section class="card" aria-labelledby="lec-h">
-        <h2 id="lec-h">อ่านไปถึงไหนแล้ว</h2>
-        <p class="sub">นับจากหัวข้อที่กด "อ่านแล้ว" ในหน้าอ่านสรุป</p>
-        <div class="lec-rows">${lecRows}</div>
-      </section>
-    </div>
-    <div class="stack">
-      <section class="card" aria-labelledby="score-h">
-        <h2 id="score-h">คะแนน Mock ล่าสุด</h2>
-        <p class="sub">${state.mocks.length ? `ทำแล้ว ${state.mocks.length} รอบ` : 'ยังไม่มีรอบที่ทำ'}</p>
-        ${spark}
-      </section>
-      <section class="card" aria-labelledby="streak-h">
-        <h2 id="streak-h">ต่อเนื่องกี่วัน</h2>
-        <div class="big-num">${streak}<span class="muted" style="font-size:1rem;font-weight:400"> วัน</span></div>
-        <div class="streak-row" role="img" aria-label="14 วันที่ผ่านมา เรียนไป ${days.filter((d) => state.days.includes(d)).length} วัน">${days.map((d) => `<span class="d ${state.days.includes(d) ? 'on' : ''}" title="${d}"></span>`).join('')}</div>
-        <p class="muted" style="margin:.9rem 0 0;font-size:.88rem">${acc === null ? 'ยังไม่มีข้อมูลความแม่นยำ' : `ตอบถูกรวม ${acc}% จาก ${state.attempts.length} ครั้ง`}</p>
-      </section>
-    </div>
-  </div>`;
+  <section class="home-sec" aria-labelledby="weak-h">
+    <h2 id="weak-h">หัวข้อที่ควรกลับไปทบทวน</h2>
+    <p class="sub">คิดจากการตอบ ${WEAK_WINDOW} ครั้งล่าสุดของแต่ละหัวข้อ แม่นต่ำกว่า 70% และตอบแล้วอย่างน้อย 2 ครั้ง</p>
+    ${weak.length ? `<ul class="weak-list">${weak.map((w) => { const s = SECTION_BY_ID[w.topic]; return `<li><a class="weak-item" href="#/notes/${s.lec}/${s.id}"><b>${esc(s.title)}</b><span class="pct">${Math.round(w.acc * 100)}%</span><small>${s.lecShort} · ตอบ ${w.n} ครั้งล่าสุด กดเพื่ออ่านหัวข้อนี้</small></a></li>`; }).join('')}</ul>` : `<div class="empty">${state.attempts.length < 2 ? '<b>ยังไม่มีข้อมูลพอ</b> ทำ Practice Quiz สักสองสามข้อ ระบบจะเริ่มชี้หัวข้อที่ควรอ่านซ้ำ' : '<b>ยังไม่พบหัวข้อที่อ่อน</b> ทำต่อเพื่อให้ผลแม่นขึ้น'}</div>`}
+  </section>`;
+  $$('[data-flec]', root).forEach((a) => a.addEventListener('click', () => { state.last.fLec = a.dataset.flec; save(); }));
   requestAnimationFrame(() => $$('[data-w]', root).forEach((el) => { el.style.width = el.dataset.w + '%'; }));
 };
 
