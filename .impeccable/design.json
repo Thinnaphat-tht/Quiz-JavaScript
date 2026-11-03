@@ -1,0 +1,127 @@
+{
+  "schemaVersion": 2,
+  "generatedAt": "2026-11-03T00:00:00Z",
+  "title": "Design System: JS Exam Guide",
+  "extensions": {
+    "colorMeta": {
+      "pen-red": { "role": "primary", "displayName": "Pen Red", "canonical": "#c4411a", "tonalRamp": ["#3a1408", "#6b230d", "#9c3010", "#c4411a", "#e0663f", "#ee9777", "#f6c4b0", "#fbe9e1"] },
+      "paper": { "role": "neutral", "displayName": "Paper", "canonical": "#faf7f2", "tonalRamp": ["#2a2118", "#4a3f33", "#75695a", "#a39683", "#cfc4b0", "#e4dccd", "#f3eee5", "#fffdf9"] },
+      "ink": { "role": "neutral", "displayName": "Ink", "canonical": "#2a2118", "tonalRamp": ["#14100b", "#2a2118", "#3d3226", "#5c5043", "#75695a", "#a39683", "#cfc4b0", "#ebe4d7"] },
+      "right-green": { "role": "feedback", "displayName": "Right Green", "canonical": "#1f7a45", "tonalRamp": ["#0e3a21", "#155a32", "#1f7a45", "#3a9a62", "#72bb8f", "#a8d6bc", "#d0e8d9", "#e3f2e8"] },
+      "wrong-red": { "role": "feedback", "displayName": "Wrong Red", "canonical": "#b3261e", "tonalRamp": ["#4a0f0b", "#7a1913", "#b3261e", "#d0504a", "#e38b86", "#efbcb7", "#f7d8d5", "#fbe6e4"] }
+    },
+    "typographyMeta": {
+      "display": { "displayName": "Display", "purpose": "Home page headline only." },
+      "headline": { "displayName": "Headline", "purpose": "Page and lecture titles." },
+      "title": { "displayName": "Title", "purpose": "Section and card headings." },
+      "body": { "displayName": "Body", "purpose": "Lecture text and explanations, 1rem at 1.8 line height." },
+      "label": { "displayName": "Label", "purpose": "Kickers, counters, chips, question numbers in mono." }
+    },
+    "shadows": [
+      { "name": "lift", "value": "0 1px 2px rgba(42, 33, 24, .06), 0 8px 24px rgba(42, 33, 24, .08)", "purpose": "Chapter-card hover and final score card only." },
+      { "name": "segment-active", "value": "0 1px 2px rgba(42, 33, 24, .12)", "purpose": "Selected item in a segmented control." }
+    ],
+    "motion": [
+      { "name": "page-in", "value": "260ms cubic-bezier(.2, .7, .2, 1)", "purpose": "Page enter: 10px rise and fade." },
+      { "name": "press", "value": "120ms ease, scale(.97)", "purpose": "Button press feedback." },
+      { "name": "hover-lift", "value": "180ms, translateY(-3px)", "purpose": "Chapter card hover." },
+      { "name": "answer-wrong", "value": "360ms ease-in-out, translateX(+-5px)", "purpose": "Gentle shake on a wrong answer." },
+      { "name": "answer-right", "value": "450ms ease-out, ring 0 to 12px green", "purpose": "One-shot ring on a correct answer." }
+    ],
+    "breakpoints": [
+      { "name": "wide", "value": "1100px" },
+      { "name": "medium", "value": "900px" },
+      { "name": "phone", "value": "560px" }
+    ]
+  },
+  "components": [
+    {
+      "name": "Primary Button",
+      "kind": "button",
+      "refersTo": "button-primary",
+      "description": "Main action: start a quiz, continue, check answer.",
+      "html": "<button class=\"ds-btn-primary\">เริ่มทำข้อสอบ</button>",
+      "css": ".ds-btn-primary { min-height: 2.75rem; padding: .55rem 1.1rem; background: #c4411a; border: 1px solid #c4411a; border-radius: 10px; color: #fff; font: 500 1rem/1.3 \"IBM Plex Sans Thai\", \"Leelawadee UI\", Tahoma, sans-serif; cursor: pointer; transition: transform .12s ease, background-color .15s; } .ds-btn-primary:hover { background: #9c3010; border-color: #9c3010; } .ds-btn-primary:active { transform: scale(.97); } .ds-btn-primary:focus-visible { outline: 2px solid #c4411a; outline-offset: 2px; }"
+    },
+    {
+      "name": "Secondary Button",
+      "kind": "button",
+      "refersTo": "button-secondary",
+      "description": "Quieter actions: previous, review, back to home.",
+      "html": "<button class=\"ds-btn\">ข้อก่อนหน้า</button>",
+      "css": ".ds-btn { min-height: 2.75rem; padding: .55rem 1.1rem; background: #fffdf9; border: 1px solid #cfc4b0; border-radius: 10px; color: #2a2118; font: 500 1rem/1.3 \"IBM Plex Sans Thai\", \"Leelawadee UI\", Tahoma, sans-serif; cursor: pointer; transition: transform .12s ease, background-color .15s, border-color .15s; } .ds-btn:hover { background: #f3eee5; border-color: #75695a; } .ds-btn:active { transform: scale(.97); } .ds-btn:focus-visible { outline: 2px solid #c4411a; outline-offset: 2px; }"
+    },
+    {
+      "name": "Chapter Card",
+      "kind": "card",
+      "refersTo": "card",
+      "description": "Lecture entry on the home page with numeral, summary, and progress.",
+      "html": "<article class=\"ds-card\"><p class=\"ds-num\">06</p><h3>JavaScript Part 1</h3><p class=\"ds-sub\">ตัวแปร ชนิดข้อมูล และฟังก์ชัน</p><div class=\"ds-bar\"><i></i></div></article>",
+      "css": ".ds-card { padding: 1.5rem; background: #fffdf9; border: 1px solid #e4dccd; border-radius: 14px; color: #2a2118; font-family: \"IBM Plex Sans Thai\", \"Leelawadee UI\", Tahoma, sans-serif; transition: transform .18s, border-color .18s, box-shadow .18s; } .ds-card:hover { transform: translateY(-3px); border-color: #efc4b3; box-shadow: 0 1px 2px rgba(42,33,24,.06), 0 8px 24px rgba(42,33,24,.08); } .ds-num { margin: 0 0 1rem; font: 500 2.6rem/1 \"IBM Plex Mono\", Consolas, monospace; letter-spacing: -.03em; color: #c4411a; } .ds-card h3 { margin: 0; font-size: 1.15rem; line-height: 1.4; } .ds-sub { margin: .5rem 0 1.2rem; font-size: .92rem; color: #5c5043; } .ds-bar { height: .5rem; background: #ebe4d7; border-radius: 99px; overflow: hidden; } .ds-bar i { display: block; height: 100%; width: 40%; background: #c4411a; border-radius: inherit; }"
+    },
+    {
+      "name": "Chip",
+      "kind": "chip",
+      "refersTo": "chip",
+      "description": "Small mono label for lecture tag or difficulty.",
+      "html": "<span class=\"ds-chip\">Lec 6</span> <span class=\"ds-chip ds-acc\">สำคัญ</span>",
+      "css": ".ds-chip { display: inline-block; padding: .05rem .5rem; border-radius: 6px; background: #f3eee5; color: #5c5043; border: 1px solid #e4dccd; font: 500 .78rem/1.7 \"IBM Plex Mono\", Consolas, monospace; } .ds-acc { background: #fbe9e1; color: #9c3010; border-color: #efc4b3; font-family: \"IBM Plex Sans Thai\", \"Leelawadee UI\", Tahoma, sans-serif; }"
+    },
+    {
+      "name": "Answer Option",
+      "kind": "custom",
+      "refersTo": "answer-option",
+      "description": "Quiz choice row with letter key; states for default, selected, correct, wrong.",
+      "html": "<button class=\"ds-opt\"><span class=\"ds-key\">A</span><span>let x = 5;</span></button> <button class=\"ds-opt ds-correct\"><span class=\"ds-key\">B</span><span>const x = 5;</span></button>",
+      "css": ".ds-opt { width: 100%; display: grid; grid-template-columns: 2rem 1fr; gap: .8rem; align-items: start; margin-bottom: .6rem; padding: .8rem 1rem; text-align: left; background: #fffdf9; border: 1.5px solid #cfc4b0; border-radius: 10px; color: #2a2118; font: 400 1rem/1.6 \"IBM Plex Mono\", Consolas, monospace; cursor: pointer; transition: transform .12s ease, border-color .15s, background-color .15s; } .ds-opt:hover { border-color: #c4411a; background: #fbe9e1; transform: translateY(-1px); } .ds-opt:focus-visible { outline: 2px solid #c4411a; outline-offset: 2px; } .ds-key { display: grid; place-items: center; width: 1.75rem; height: 1.75rem; border-radius: 6px; background: #f3eee5; border: 1px solid #e4dccd; font: 600 .82rem/1 \"IBM Plex Mono\", Consolas, monospace; color: #5c5043; } .ds-correct { border-color: #1f7a45; background: #e3f2e8; } .ds-correct .ds-key { background: #1f7a45; border-color: #1f7a45; color: #fff; }"
+    },
+    {
+      "name": "Note Callout",
+      "kind": "custom",
+      "refersTo": "card",
+      "description": "Dashed callout that labels author-added content as หมายเหตุ.",
+      "html": "<div class=\"ds-note\"><div class=\"ds-note-title\">หมายเหตุ</div><p>ข้อนี้ไม่ได้อยู่ในสไลด์ เติมเพื่อให้เข้าใจง่ายขึ้น</p></div>",
+      "css": ".ds-note { margin: 1.1rem 0; padding: 1rem 1.15rem; border: 1px dashed #cfc4b0; border-radius: 10px; background: transparent; color: #5c5043; font: 400 .94rem/1.8 \"IBM Plex Sans Thai\", \"Leelawadee UI\", Tahoma, sans-serif; } .ds-note-title { margin-bottom: .4rem; font-weight: 500; font-size: .95rem; color: #75695a; } .ds-note p { margin: 0; }"
+    },
+    {
+      "name": "Code Box",
+      "kind": "custom",
+      "refersTo": "card",
+      "description": "Code sample with copy button and output panel.",
+      "html": "<div class=\"ds-code\"><div class=\"ds-code-head\"><span>JavaScript</span><button>คัดลอก</button></div><pre><code>console.log(1 + '2');</code></pre><div class=\"ds-out\"><span>ผลลัพธ์</span><pre>12</pre></div></div>",
+      "css": ".ds-code { border: 1px solid #cfc4b0; border-radius: 10px; overflow: hidden; background: #f3eee5; color: #2a2118; } .ds-code-head { display: flex; align-items: center; justify-content: space-between; padding: .3rem .4rem .3rem .9rem; border-bottom: 1px solid #e4dccd; font: 500 .76rem/1 \"IBM Plex Mono\", Consolas, monospace; color: #75695a; } .ds-code-head button { min-height: 2rem; padding: .2rem .6rem; border: 0; border-radius: 6px; background: transparent; color: #5c5043; font: 500 .78rem/1 \"IBM Plex Sans Thai\", \"Leelawadee UI\", Tahoma, sans-serif; cursor: pointer; } .ds-code-head button:hover { background: #ebe4d7; color: #2a2118; } .ds-code pre { margin: 0; padding: .9rem 1rem; font: 400 .86rem/1.7 \"IBM Plex Mono\", Consolas, monospace; } .ds-out { border-top: 1px dashed #cfc4b0; padding: .7rem 1rem .8rem; background: #fffdf9; } .ds-out span { display: block; margin-bottom: .4rem; font: 500 .74rem/1 \"IBM Plex Mono\", Consolas, monospace; color: #75695a; } .ds-out pre { padding: 0; }"
+    }
+  ],
+  "narrative": {
+    "northStar": "The Study Notebook",
+    "overview": "A well-kept revision notebook: warm paper, dark brown ink, and a single red-orange pen used to mark what matters. The page is built to be read for a long time, usually by a student the night before an exam, so legibility comes before every other decision. Type is large, line height is generous (1.8 for body text), and contrast is high.\n\nThe system is calm and sure of itself. Surfaces are flat paper, separated by thin rules rather than shadows. Controls respond clearly but never play. There is no glow, no gradient decoration, no emoji, no bento grid, and no purple or blue anywhere.",
+    "keyCharacteristics": [
+      "Warm paper neutrals tinted toward brown, never cool grey.",
+      "One accent (the red-orange pen) carries all emphasis; green and red appear only as answer feedback.",
+      "Thai-first typography with a monospace voice for code, numbers, and labels.",
+      "Thin rules and tonal steps for structure; shadow is rare.",
+      "Readable on a phone at arm's length, offline, from a single file."
+    ],
+    "rules": [
+      { "name": "The One Pen Rule", "body": "The red-orange accent is the only decorative colour. Green, red, and amber exist to report answer state and warnings, never to decorate.", "section": "colors" },
+      { "name": "The No Cool Colour Rule", "body": "No blue, purple, or cool grey in the palette or in syntax colours.", "section": "colors" },
+      { "name": "The Reading First Rule", "body": "Body text is never smaller than 1rem and never tighter than 1.7 line height; small sizes are for metadata only.", "section": "typography" },
+      { "name": "The Mono Means Machine Rule", "body": "Monospace marks code, numbers, and system labels; prose is never set in mono.", "section": "typography" },
+      { "name": "The Flat Until Touched Rule", "body": "Surfaces are flat at rest; lift and shadow are a response to pointer hover only.", "section": "elevation" }
+    ],
+    "dos": [
+      "Do keep text at 1rem or larger with a 1.7 to 1.8 line height for anything the student must read.",
+      "Do use Pen Red for the single most important thing on a screen and let paper and ink carry the rest.",
+      "Do pair every correct/wrong colour with an icon or text.",
+      "Do keep the manual light/dark toggle and honour prefers-reduced-motion.",
+      "Do mark author-added content with a \"หมายเหตุ\" note callout."
+    ],
+    "donts": [
+      "Don't use purple or blue, or cool greys.",
+      "Don't use emoji, glow effects, heavy gradients, bento grids, or decorative fake code imagery.",
+      "Don't use shadows at rest; lift only on hover.",
+      "Don't add a second accent colour for decoration.",
+      "Don't shrink body copy to fit more on screen; scroll instead."
+    ]
+  }
+}

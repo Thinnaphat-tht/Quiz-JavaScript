@@ -58,6 +58,7 @@ const ICONS = {
   menu: '<path d="M4 7h16M4 12h16M4 17h16"/>',
   copy: '<rect x="8" y="8" width="11" height="12" rx="1.5"/><path d="M5 16V5.5C5 4.7 5.7 4 6.5 4H16"/>',
   check: '<path d="m5 12.5 4.5 4.5L19 7.5"/>',
+  circle: '<circle cx="12" cy="12" r="8"/>',
   x: '<path d="M6 6l12 12M18 6 6 18"/>',
   chev: '<path d="m6 9 6 6 6-6"/>',
   arrow: '<path d="M5 12h14M13 6l6 6-6 6"/>',
@@ -304,7 +305,7 @@ PAGES.notes = (root, lecId, secId) => {
   const idx = NOTES.indexOf(lec);
   root.innerHTML = `
   <div class="notes-bar">
-    <div class="seg grow" role="tablist" aria-label="เลือกบท">${NOTES.map((n) => `<button role="tab" aria-selected="${n.id === lec.id}" data-lec="${n.id}">${n.short}</button>`).join('')}</div>
+    <div class="seg grow" role="group" aria-label="เลือกบท">${NOTES.map((n) => `<button type="button" aria-pressed="${n.id === lec.id}" data-lec="${n.id}">${n.short}</button>`).join('')}</div>
     <button class="btn btn-sm toc-btn" type="button" aria-expanded="false">สารบัญ</button>
   </div>
   <div class="reader">
@@ -313,8 +314,8 @@ PAGES.notes = (root, lecId, secId) => {
       ${lec.sections.map((s, i) => `
       <section class="sec" id="${s.id}" data-open="true" data-id="${s.id}">
         <div class="sec-head">
-          <button class="sec-toggle" type="button" aria-expanded="true" aria-controls="b-${s.id}"><span class="idx">${String(i + 1).padStart(2, '0')}</span><h2>${esc(s.title)}</h2><span class="chev">${icon('chev', 18)}</span></button>
-          <button class="read-btn" type="button" aria-pressed="${!!state.read[s.id]}">${icon('check', 16)}<span>${state.read[s.id] ? 'อ่านแล้ว' : 'ทำเครื่องหมายว่าอ่านแล้ว'}</span></button>
+          <h2 class="sec-h"><button class="sec-toggle" type="button" aria-expanded="true" aria-controls="b-${s.id}"><span class="idx">${String(i + 1).padStart(2, '0')}</span><span class="sec-title">${esc(s.title)}</span><span class="chev">${icon('chev', 18)}</span></button></h2>
+          <button class="read-btn" type="button" aria-pressed="${!!state.read[s.id]}">${icon(state.read[s.id] ? 'check' : 'circle', 16)}<span>${state.read[s.id] ? 'อ่านแล้ว' : 'ทำเครื่องหมายว่าอ่านแล้ว'}</span></button>
         </div>
         <div class="sec-body" id="b-${s.id}"><div class="sec-inner">${s.blocks.map(renderBlock).join('')}</div></div>
       </section>`).join('')}
@@ -355,6 +356,7 @@ PAGES.notes = (root, lecId, secId) => {
       markToday(); save(); railStatus();
       rb.setAttribute('aria-pressed', now);
       $('span', rb).textContent = now ? 'อ่านแล้ว' : 'ทำเครื่องหมายว่าอ่านแล้ว';
+      $('svg', rb).outerHTML = icon(now ? 'check' : 'circle', 16);
       $(`[data-toc="${id}"]`, root).classList.toggle('is-read', now);
       if (now) {
         toast(`อ่านแล้ว ${readCount()} จาก ${SECTIONS.length} หัวข้อ`);
@@ -455,7 +457,7 @@ function optionsFor(q) {
   return order.map((orig) => ({ orig, text: q.opts[orig] }));
 }
 function questionBody(q) {
-  return `<div class="q-text">${esc(q.q)}</div>${q.code ? codeBox(q.code, q.lang || 'js') : ''}`;
+  return `<div class="q-text" tabindex="-1">${esc(q.q)}</div>${q.code ? codeBox(q.code, q.lang || 'js') : ''}`;
 }
 function optionHtml(o, i, q, cls = '') {
   const isCode = q.type === 'out' || o.text.includes('\n');
@@ -473,7 +475,7 @@ PAGES.practice = (root) => {
 
   function shell() {
     root.innerHTML = `
-    <header class="page-head"><div class="kicker">Practice Quiz · ${PRACTICE.length} ข้อ</div><h1>ฝึกทำข้อสอบ</h1><p>ตอบแล้วเฉลยทันทีพร้อมคำอธิบาย และลิงก์กลับไปหัวข้อที่เกี่ยวข้อง กดตัวเลข 1–4 เพื่อเลือกคำตอบ กด Enter เพื่อไปข้อถัดไป</p></header>
+    <header class="page-head"><div class="kicker">Practice Quiz · ${PRACTICE.length} ข้อ</div><h1>ฝึกทำข้อสอบ</h1><p>ตอบแล้วเฉลยทันทีพร้อมคำอธิบาย และลิงก์กลับไปหัวข้อที่เกี่ยวข้อง<span class="kbd-hint"> กดตัวเลข 1–4 เพื่อเลือกคำตอบ กด Enter เพื่อไปข้อถัดไป</span></p></header>
     <div class="q-tools">
       <div class="grp"><span>บท</span><div class="seg" id="f-lec">${['all', ...LEC_KEYS].map((k) => `<button aria-pressed="${fLec === k}" data-v="${k}">${k === 'all' ? 'ทั้งหมด' : LEC_LABEL[k]}</button>`).join('')}</div></div>
       <div class="grp"><span>ชนิด</span><div class="seg" id="f-type">${['all', 'mc', 'out', 'bug'].map((k) => `<button aria-pressed="${fType === k}" data-v="${k}">${k === 'all' ? 'ทั้งหมด' : TYPE_LABEL[k]}</button>`).join('')}</div></div>
@@ -531,14 +533,14 @@ PAGES.practice = (root) => {
       const ok = orig === q.ans;
       optBtns.forEach((b) => {
         const o = Number(b.dataset.orig);
-        b.disabled = true;
+        b.setAttribute('aria-disabled', 'true');
         $('.mark', b).innerHTML = o === q.ans ? markSvg(true) : o === orig ? markSvg(false) : '';
         if (o === q.ans) b.classList.add('correct', ...(fresh && ok ? ['pop'] : []));
         else if (o === orig) b.classList.add('wrong', ...(fresh ? ['shake'] : []));
         else b.classList.add('dim');
       });
       const sec = SECTION_BY_ID[q.topic];
-      $('#explain', area).innerHTML = `<div class="explain ${ok ? 'ok' : 'bad'}" role="status"><h3>${markSvg(ok)} ${ok ? 'ถูกต้อง' : 'ยังไม่ถูก'}</h3><p>${esc(q.why)}</p><a class="btn btn-sm go" href="#/notes/${sec.lec}/${sec.id}">${icon('book', 16)} อ่านหัวข้อ: ${esc(sec.title)}</a></div>`;
+      $('#explain', area).innerHTML = `<div class="explain ${ok ? 'ok' : 'bad'}" role="status" tabindex="-1"><h3>${markSvg(ok)} ${ok ? 'ถูกต้อง' : 'ยังไม่ถูก'}</h3><p>${esc(q.why)}</p><a class="btn btn-sm go" href="#/notes/${sec.lec}/${sec.id}">${icon('book', 16)} อ่านหัวข้อ: ${esc(sec.title)}</a></div>`;
     };
     const choose = (orig) => {
       if (state.practice[q.id] !== undefined) return;
@@ -547,6 +549,9 @@ PAGES.practice = (root) => {
       logAttempt(q, ok, 'practice');
       save(); railStatus();
       showResult(orig, true);
+      const ex = $('.explain', area);
+      ex.focus({ preventScroll: true });
+      ex.scrollIntoView({ block: 'nearest', behavior: reduceMotion() ? 'auto' : 'smooth' });
       const dot = $(`.qdot[data-i="${cur}"]`, area);
       dot.classList.add(ok ? 'ok' : 'bad');
       const n = list.filter((x) => state.practice[x.id] !== undefined).length;
@@ -555,7 +560,7 @@ PAGES.practice = (root) => {
     optBtns.forEach((b) => b.addEventListener('click', () => choose(Number(b.dataset.orig))));
     if (answered) showResult(picked, false);
 
-    const go = (i) => { cur = i; draw(); $('.q-card', root).scrollIntoView({ block: 'nearest' }); };
+    const go = (i) => { cur = i; draw(); $('.q-card', root).scrollIntoView({ block: 'nearest' }); $('.q-text', root).focus({ preventScroll: true }); };
     $('#prev', area).onclick = () => go(cur - 1);
     $('#next', area).onclick = () => (cur === list.length - 1 ? summary() : go(cur + 1));
     $$('.qdot', area).forEach((d) => d.addEventListener('click', () => go(Number(d.dataset.i))));
@@ -595,7 +600,7 @@ PAGES.practice = (root) => {
     if (!area || !$('.opt', area)) return;
     if (/^[1-4]$/.test(e.key)) {
       const b = $$('.opt', area)[Number(e.key) - 1];
-      if (b && !b.disabled) b.click();
+      if (b && b.getAttribute('aria-disabled') !== 'true' && !b.disabled) b.click();
     } else if (e.key === 'Enter' && !t.closest('button')) {
       const n = $('#next', area); if (n) n.click();
     }
